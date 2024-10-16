@@ -14,3 +14,5 @@ router.get('/users', async (req, res) => {
     res.status(500).json({ message: 'Error fetching users' });
   }
 });
+
+module.exports = router;
