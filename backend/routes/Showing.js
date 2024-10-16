@@ -26,6 +26,21 @@ router.post('/showing', async (req, res) => {
   }
 });
 
+// Route to handle GET request to fetch all showings
+router.get('/showing', async (req, res) => {
+  try {
+    // Fetch all showings from the database
+    const showings = await Showing.find();
+    
+    // Return the showings as a response
+    res.status(200).json(showings);
+  } catch (error) {
+    console.error('Error fetching showings:', error);
+    res.status(500).json({ message: 'Error fetching showings' });
+  }
+});
+
+
 // routes/showing.js
 // Additional route for assigning a user to a showing
 
