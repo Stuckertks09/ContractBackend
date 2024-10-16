@@ -8,7 +8,10 @@ const twilio = require('twilio');
 const listingsRoute = require('./routes/listings');
 const twilioRoute = require('./routes/twilio');
 const searchRoute = require('./routes/search');
-const authRoute = require('./routes/auth');  
+const authRoute = require('./routes/auth');
+const showingRoutes = require('./routes/Showing');
+const userRoutes = require('./routes/user');
+
 
 dotenv.config(); // Load environment variables
 
@@ -40,7 +43,9 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
 app.use('/api/listings', listingsRoute);
 app.use('/api/send-message', twilioRoute);
 app.use('/api/search', searchRoute);
-app.use('/api/auth', authRoute);  
+app.use('/api/auth', authRoute);
+app.use('/api', showingRoutes);
+app.use('/api', userRoutes);  
 
 // Start the server with WebSockets enabled
 const PORT = process.env.PORT || 5001;
