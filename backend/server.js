@@ -11,6 +11,7 @@ const searchRoute = require('./routes/search');
 const authRoute = require('./routes/auth');
 const showingRoutes = require('./routes/Showing');
 const userRoutes = require('./routes/user');
+const chatRoutes = require('./routes/chatRoutes')
 
 
 dotenv.config(); // Load environment variables
@@ -45,7 +46,11 @@ app.use('/api/send-message', twilioRoute);
 app.use('/api/search', searchRoute);
 app.use('/api/auth', authRoute);
 app.use('/api', showingRoutes);
-app.use('/api', userRoutes);  
+app.use('/api', userRoutes);
+app.use('/api/chat', chatRoutes); 
+
+// Import and use the Socket.IO handler
+require('./routes/socket')(io);  // Pass the io instance to the socket handler
 
 // Start the server with WebSockets enabled
 const PORT = process.env.PORT || 5001;

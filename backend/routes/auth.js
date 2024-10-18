@@ -15,20 +15,24 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'User not found' });
     }
 
-    // Check if the password matches
+    // Compare the password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid password' });
+      return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Optional: Generate a JWT token (if you want to implement token-based authentication)
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // Generate a JWT token (optional, if using for authentication)
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    // Send success response with the token
-    return res.status(200).json({ message: 'Login successful', token, id: user._id });
+    // Return the user details along with the chatId for private room connection
+    return res.status(200).json({
+      token,
+      userId: user._id,
+      username: user.username,
+      chatId: user.chatId,  // Include chatId for private room connection
+    });
 
   } catch (error) {
-    // Log the error and send server error response
     console.error('Login Error:', error);
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
