@@ -5,12 +5,18 @@ const Chat = require('../models/chat');  // Mongoose model for storing chat mess
 const Assignment = require('../models/Assignment');  // Mongoose model for chat assignments
 const router = express.Router();
 
-// Route to fetch messages of a particular chat
 router.get('/conversations/:chatId', async (req, res) => {
     const { chatId } = req.params;
+
     try {
+        // Fetch all messages for the given chatId
         const messages = await Chat.find({ chatId });
-        res.status(200).json(messages);
+
+        if (messages.length > 0) {
+            res.status(200).json({ messages });  // Return as an array
+        } else {
+            res.status(404).json({ message: 'No messages found for this chat' });
+        }
     } catch (error) {
         res.status(500).json({ message: 'Error fetching messages', error });
     }
