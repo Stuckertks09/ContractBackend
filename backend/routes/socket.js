@@ -20,6 +20,7 @@ module.exports = (io) => {
                     chatId,
                     senderId,
                     message,
+                    senderName,
                     timestamp: new Date(),  // Store the timestamp of the message
                 });
 
