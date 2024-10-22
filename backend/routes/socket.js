@@ -14,11 +14,6 @@ module.exports = (io) => {
         socket.on('sendMessage', async (data) => {
             const { chatId, senderId, message, senderName } = data;  // Include senderName here
 
-            if (!chatId || !senderId || !message || !senderName) {
-                socket.emit('errorMessage', { message: 'Invalid data, missing required fields.' });
-                return;
-            }
-
             try {
                 // Save message to MongoDB
                 const newMessage = new Chat({
