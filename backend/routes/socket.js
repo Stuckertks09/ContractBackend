@@ -2,7 +2,7 @@ const Chat = require('../models/chat'); // Import the Chat model
 
 module.exports = (io) => {
     io.on('connection', (socket) => {
-        console.log('New client connected:', socket.id);
+        console.log(`New client connected: ${socket.id}`);
 
         // Client or agent joins a chat room
         socket.on('joinRoom', (chatId) => {
@@ -20,7 +20,7 @@ module.exports = (io) => {
                     chatId,
                     senderId,
                     message,
-                    timestamp: new Date(),  // Optionally store the timestamp of the message
+                    timestamp: new Date(),  // Store the timestamp of the message
                 });
 
                 await newMessage.save();
@@ -52,3 +52,4 @@ module.exports = (io) => {
         });
     });
 };
+
