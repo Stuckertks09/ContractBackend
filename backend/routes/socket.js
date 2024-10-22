@@ -25,15 +25,15 @@ module.exports = (io) => {
 
                 await newMessage.save();
 
-                // Emit the message back to the clients and agents in the same room
-                io.to(chatId).emit('receiveMessage', {
+                // Emit the message back to the clients and agents in the same room, except the sender
+                socket.broadcast.to(chatId).emit('receiveMessage', {
                     chatId: newMessage.chatId,
                     senderId: newMessage.senderId,
                     message: newMessage.message,
                     timestamp: newMessage.timestamp,
                 });
 
-                console.log(`Message sent to room: ${chatId}`);
+                console.log(`Message sent to room (except sender): ${chatId}`);
             } catch (error) {
                 console.error('Error saving message to MongoDB:', error);
                 socket.emit('errorMessage', { message: 'Failed to send message, please try again later.' });
