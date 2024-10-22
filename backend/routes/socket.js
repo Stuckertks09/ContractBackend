@@ -31,6 +31,7 @@ module.exports = (io) => {
                     chatId: newMessage.chatId,
                     senderId: newMessage.senderId,
                     message: newMessage.message,
+                    senderName: newMessage.senderName,
                     timestamp: newMessage.timestamp,
                 });
 
