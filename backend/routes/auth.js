@@ -30,7 +30,9 @@ router.post('/login', async (req, res) => {
       token,
       userId: user._id,
       username: user.username,
-      chatId: user.chatId,  // Include chatId for private room connection
+      chatId: user.chatId,
+      FirstName: user.FirstName
+      LastName: user.LastName
     });
 
   } catch (error) {
