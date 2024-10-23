@@ -6,7 +6,7 @@ const chatSchema = new mongoose.Schema({
     senderId: { type: String, required: true },
     senderName: { type: String, required: false },
     message: { type: String, required: true },
-    agentIds: [{ type: String }],
+    agentIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Agent' }],
     timestamp: { type: Date, default: Date.now },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 });
