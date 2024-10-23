@@ -49,6 +49,52 @@ router.get('/chats', async (req, res) => {
     }
 });
 
+// Fetch all chats with the users who are part of each chat
+router.get('/chats2', async (req, res) => {
+    try {
+        const chats = await Chat.aggregate([
+            {
+                $group: {
+                    _id: "$chatId",  // Group by chatId
+                    lastMessage: { $first: "$message" },  // Get the most recent message
+                    chatId: { $first: "$chatId" },  // Include the chatId
+                    userIds: { $addToSet: "$userId" }  // Collect all unique user IDs in the chat
+                }
+            },
+            // Lookup the User collection to get all users' firstName and lastName using userIds
+            {
+                $lookup: {
+                    from: "users",  // Collection name for users
+                    localField: "userIds",  // Array of userIds in the Chat collection
+                    foreignField: "_id",  // Match by _id field in User collection
+                    as: "userInfo"  // The output array field
+                }
+            },
+            // Project the fields we want to return in the final response
+            {
+                $project: {
+                    chatId: 1,
+                    lastMessage: 1,
+                    userNames: { $map: {  // Map the userInfo array to combine firstName and lastName
+                        input: "$userInfo",
+                        as: "user",
+                        in: { $concat: ["$$user.FirstName", " ", "$$user.LastName"] }  // Concatenate firstName and lastName
+                    } }
+                }
+            }
+        ]);
+
+        if (chats.length > 0) {
+            res.status(200).json(chats);  // Return the list of chats with users' names
+        } else {
+            res.status(404).json({ message: 'No chats found' });
+        }
+    } catch (error) {
+        console.error('Error fetching chats:', error);
+        res.status(500).json({ message: 'Error fetching chats', error });
+    }
+});
+
 // Add agent to a chat
 router.post('/chat/add-agent', async (req, res) => {
   const { chatId, agentId } = req.body;
