@@ -103,8 +103,8 @@ router.post('/agent/login', async (req, res) => {
     return res.status(200).json({
       token,
       agentId: agent._id,
-      FirstName: agent.firstName,
-      LastName: agent.lastName,
+      FirstName: agent.FirstName,
+      LastName: agent.LastName,
       email: agent.email,
     });
 
