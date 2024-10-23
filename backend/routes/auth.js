@@ -69,8 +69,8 @@ router.post('/login', async (req, res) => {
       userId: user._id,
       username: user.username,
       chatId: user.chatId,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      FirstName: user.firstName,
+      LastName: user.lastName,
     });
 
   } catch (error) {
@@ -103,8 +103,8 @@ router.post('/agent/login', async (req, res) => {
     return res.status(200).json({
       token,
       agentId: agent._id,
-      firstName: agent.firstName,
-      lastName: agent.lastName,
+      FirstName: agent.firstName,
+      LastName: agent.lastName,
       email: agent.email,
     });
 
@@ -130,8 +130,8 @@ router.post('/agent/create', async (req, res) => {
 
     // Create a new agent
     const newAgent = new Agent({
-      firstName,
-      lastName,
+      FirstName,
+      LastName,
       email,
       password: hashedPassword,
     });
