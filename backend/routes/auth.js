@@ -116,7 +116,7 @@ router.post('/agent/login', async (req, res) => {
 
 // Admin route to create a new agent (admin-only)
 router.post('/agent/create', async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
+  const { FirstName, LastName, email, password } = req.body;
 
   try {
     // Check if the agent already exists
