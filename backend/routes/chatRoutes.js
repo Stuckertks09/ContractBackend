@@ -1,10 +1,10 @@
-// File: chatRoutes.js
-
 const express = require('express');
 const Chat = require('../models/chat');  // Mongoose model for storing chat messages
+const User = require('../models/User');  // Mongoose model for user
 const Assignment = require('../models/Assignment');  // Mongoose model for chat assignments
 const router = express.Router();
 
+// Fetch all messages for a specific chat
 router.get('/conversations/:chatId', async (req, res) => {
     const { chatId } = req.params;
 
@@ -78,6 +78,25 @@ router.post('/chat/add-agent', async (req, res) => {
   }
 });
 
+// Fetch all chats assigned to a specific agent
+router.get('/agent/:agentId/chats', async (req, res) => {
+    const { agentId } = req.params;
+
+    try {
+        // Find all chats where the agent is assigned (agentId is in the agentIds array)
+        const assignedChats = await Chat.find({ agentIds: agentId });
+
+        if (assignedChats.length > 0) {
+            res.status(200).json(assignedChats);  // Return the assigned chats
+        } else {
+            res.status(404).json({ message: 'No chats found for this agent' });
+        }
+    } catch (error) {
+        console.error('Error fetching agent chats:', error);
+        res.status(500).json({ message: 'Error fetching agent chats', error });
+    }
+});
+
 // Reassign chat to a new agent or group
 router.post('/chat/reassign', async (req, res) => {
     const { userId, newAgentRoom } = req.body;  // newAgentRoom represents the new chat room for the agent or group
@@ -98,7 +117,7 @@ router.post('/chat/reassign', async (req, res) => {
       console.error('Reassignment Error:', error);
       return res.status(500).json({ message: 'Server error', error: error.message });
     }
-  });
-  
+});
 
 module.exports = router;
+
