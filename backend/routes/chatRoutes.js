@@ -1,6 +1,7 @@
 const express = require('express');
 const Chat = require('../models/chat');  // Mongoose model for storing chat messages
-const User = require('../models/User');  // Mongoose model for user
+const User = require('../models/User');
+const Agent = require('../models/Agent'); // Mongoose model for user
 const Assignment = require('../models/Assignment');  // Mongoose model for chat assignments
 const router = express.Router();
 
