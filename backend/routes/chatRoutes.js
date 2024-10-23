@@ -22,6 +22,33 @@ router.get('/conversations/:chatId', async (req, res) => {
     }
 });
 
+// Fetch all unique chats with the latest message
+router.get('/chats', async (req, res) => {
+    try {
+        // Aggregate to find the latest message for each unique chatId
+        const chats = await Chat.aggregate([
+            { $sort: { timestamp: -1 } },  // Sort by timestamp, latest first
+            {
+                $group: {
+                    _id: "$chatId",  // Group by chatId
+                    lastMessage: { $first: "$message" },  // Get the most recent message
+                    name: { $first: "$senderName" },  // Use senderName as chat name for simplicity
+                    chatId: { $first: "$chatId" }  // Include the chatId in the response
+                }
+            }
+        ]);
+
+        if (chats.length > 0) {
+            res.status(200).json(chats);  // Return the list of chats
+        } else {
+            res.status(404).json({ message: 'No chats found' });
+        }
+    } catch (error) {
+        console.error('Error fetching chats:', error);
+        res.status(500).json({ message: 'Error fetching chats', error });
+    }
+});
+
 // Reassign chat to a new agent or group
 router.post('/chat/reassign', async (req, res) => {
     const { userId, newAgentRoom } = req.body;  // newAgentRoom represents the new chat room for the agent or group
