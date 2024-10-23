@@ -19,7 +19,7 @@ router.get('/users', async (req, res) => {
 router.get('/agents', async (req, res) => {
   try {
     // Find all agents and return only necessary fields (e.g., firstName, lastName, email, _id)
-    const agents = await Agent.find({}, 'firstName lastName email _id');
+    const agents = await Agent.find({}, 'FirstName LastName email _id');
     res.status(200).json(agents);
   } catch (error) {
     console.error('Error fetching agents:', error);
