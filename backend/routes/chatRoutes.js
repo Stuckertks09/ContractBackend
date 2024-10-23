@@ -95,33 +95,33 @@ router.get('/chats2', async (req, res) => {
     }
 });
 
-// Add agent to a chat
-router.post('/chat/add-agent', async (req, res) => {
-  const { chatId, agentId } = req.body;
+// Add a chat room to an agent
+router.post('/agent/add-chat', async (req, res) => {
+    const { agentId, chatId } = req.body;
 
-  try {
-    // Find the chat by chatId
-    const chat = await Chat.findOne({ chatId });
-    if (!chat) {
-      return res.status(404).json({ message: 'Chat not found' });
+    try {
+        // Find the agent by agentId
+        const agent = await Agent.findById(agentId);
+        if (!agent) {
+            return res.status(404).json({ message: 'Agent not found' });
+        }
+
+        // Check if the agent is already part of this chat room
+        if (agent.chatIds.includes(chatId)) {
+            return res.status(400).json({ message: 'Agent is already part of this chat' });
+        }
+
+        // Add the chatId to the agent's list of chat rooms
+        agent.chatIds.push(chatId);
+
+        // Save the updated agent
+        await agent.save();
+
+        return res.status(200).json({ message: 'Chat added to agent successfully', agent });
+    } catch (error) {
+        console.error('Error adding chat to agent:', error);
+        return res.status(500).json({ message: 'Server error', error: error.message });
     }
-
-    // Check if the agent is already assigned to the chat
-    if (chat.agentIds.includes(agentId)) {
-      return res.status(400).json({ message: 'Agent is already assigned to this chat' });
-    }
-
-    // Add the new agentId to the array of agents
-    chat.agentIds.push(agentId);
-
-    // Save the updated chat
-    await chat.save();
-
-    return res.status(200).json({ message: 'Agent added to chat', chat });
-  } catch (error) {
-    console.error('Add Agent Error:', error);
-    return res.status(500).json({ message: 'Server error', error: error.message });
-  }
 });
 
 // Fetch all chats assigned to a specific agent
