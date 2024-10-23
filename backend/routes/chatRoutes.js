@@ -49,6 +49,35 @@ router.get('/chats', async (req, res) => {
     }
 });
 
+// Add agent to a chat
+router.post('/chat/add-agent', async (req, res) => {
+  const { chatId, agentId } = req.body;
+
+  try {
+    // Find the chat by chatId
+    const chat = await Chat.findOne({ chatId });
+    if (!chat) {
+      return res.status(404).json({ message: 'Chat not found' });
+    }
+
+    // Check if the agent is already assigned to the chat
+    if (chat.agentIds.includes(agentId)) {
+      return res.status(400).json({ message: 'Agent is already assigned to this chat' });
+    }
+
+    // Add the new agentId to the array of agents
+    chat.agentIds.push(agentId);
+
+    // Save the updated chat
+    await chat.save();
+
+    return res.status(200).json({ message: 'Agent added to chat', chat });
+  } catch (error) {
+    console.error('Add Agent Error:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // Reassign chat to a new agent or group
 router.post('/chat/reassign', async (req, res) => {
     const { userId, newAgentRoom } = req.body;  // newAgentRoom represents the new chat room for the agent or group
