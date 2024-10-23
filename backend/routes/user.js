@@ -7,7 +7,7 @@ const Agent = require('../models/Agent');  // Import the Agent model
 router.get('/users', async (req, res) => {
   try {
     // Find all users and return only necessary fields (e.g., username, email, _id)
-    const users = await User.find({}, 'username email _id');
+    const users = await User.find({}, 'FirstName LastName username email _id');
     res.status(200).json(users);
   } catch (error) {
     console.error('Error fetching users:', error);
