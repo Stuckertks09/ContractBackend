@@ -66,4 +66,36 @@ router.post('/showing/assign', async (req, res) => {
     }
   });
 
+const express = require('express');
+const Showing = require('./models/Showing');
+const router = express.Router();
+
+// Endpoint to submit an opinion for a specific showing
+router.post('/showings/:showingId/opinion', async (req, res) => {
+  const { showingId } = req.params;
+  const { userId, rating, notes } = req.body;
+
+  try {
+    // Find the showing by ID and push the new opinion to the opinions array
+    const updatedShowing = await Showing.findByIdAndUpdate(
+      showingId,
+      { 
+        $push: { opinions: { rating, notes } } 
+      },
+      { new: true } // Return the updated showing
+    );
+
+    if (!updatedShowing) {
+      return res.status(404).json({ message: 'Showing not found' });
+    }
+
+    res.status(200).json({ message: 'Opinion added successfully', showing: updatedShowing });
+  } catch (error) {
+    res.status(500).json({ message: 'Error adding opinion', error });
+  }
+});
+
+module.exports = router;
+
+
 module.exports = router;
