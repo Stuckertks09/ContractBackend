@@ -6,7 +6,8 @@ const agentSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   chatIds: [{ type: String, ref: 'Chat' }],  // List of assigned chat references
-  agentId: { type: String },  // Example field for agent expertise
+  agentId: { type: String },
+  agentMLSId: { typle: String},// Example field for agent expertise
   availability: { type: Boolean, default: true },  // Example availability status
 }, { timestamps: true });
 
