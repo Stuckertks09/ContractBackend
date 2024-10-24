@@ -1,6 +1,22 @@
 const mongoose = require('mongoose');
 
-// Define the schema for a showing
+// Define the schema for an opinion (without userId)
+const opinionSchema = new mongoose.Schema({
+  rating: {
+    type: Number,
+    required: true
+  },
+  notes: {
+    type: String,
+    required: true
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+// Define the schema for a showing, with embedded opinions
 const showingSchema = new mongoose.Schema({
   dateTime: {
     type: String,
@@ -11,16 +27,17 @@ const showingSchema = new mongoose.Schema({
     required: true
   },
   instructions: {
-    type: String,
+    type: String
   },
   userId: {
-    type: String, // This will hold the ID of the user assigned to the showing
-    default: null // Initially null, as the agent assigns the user later
+    type: String, 
+    default: null 
   },
-  agentMLSId: {  // Fixed missing colon
+  agentMLSId: {
     type: String,
-    default: null // Optionally set a default value if needed
-  }
+    default: null
+  },
+  opinions: [opinionSchema]  // Embedding opinions without userId
 });
 
 // Create the model from the schema
