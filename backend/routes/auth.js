@@ -106,6 +106,7 @@ router.post('/agent/login', async (req, res) => {
       FirstName: agent.FirstName,
       LastName: agent.LastName,
       email: agent.email,
+      agentMLSId: agent.agentMLSId,
     });
 
   } catch (error) {
