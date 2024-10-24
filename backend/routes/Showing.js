@@ -66,12 +66,8 @@ router.post('/showing/assign', async (req, res) => {
     }
   });
 
-const express = require('express');
-const Showing = require('./models/Showing');
-const router = express.Router();
-
 // Endpoint to submit an opinion for a specific showing
-router.post('/showings/:showingId/opinion', async (req, res) => {
+router.post('/showing/:showingId/opinion', async (req, res) => {
   const { showingId } = req.params;
   const { userId, rating, notes } = req.body;
 
