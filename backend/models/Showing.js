@@ -17,7 +17,9 @@ const showingSchema = new mongoose.Schema({
   userId: {
     type: String, // This will hold the ID of the user assigned to the showing
     default: null // Initially null, as the agent assigns the user later
-  }
+  },
+  agentMLSId {
+    type: String,
 });
 
 // Create the model from the schema
