@@ -1,4 +1,3 @@
-// models/Showing.js
 const mongoose = require('mongoose');
 
 // Define the schema for a showing
@@ -18,8 +17,10 @@ const showingSchema = new mongoose.Schema({
     type: String, // This will hold the ID of the user assigned to the showing
     default: null // Initially null, as the agent assigns the user later
   },
-  agentMLSId: {
+  agentMLSId: {  // Fixed missing colon
     type: String,
+    default: null // Optionally set a default value if needed
+  }
 });
 
 // Create the model from the schema
