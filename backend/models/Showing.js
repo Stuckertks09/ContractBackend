@@ -27,10 +27,10 @@ const showingSchema = new mongoose.Schema({
     required: true
   },
   instructions: {
-    type: String
+    type: String,
   },
    MLSNumber: {
-    type: String
+    type: String,
   },
   userId: {
     type: String, 
