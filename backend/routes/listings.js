@@ -28,7 +28,7 @@ const listings = await Listing.find({
 router.get('/:id', async (req, res) => {
     try {
         // Include media in the projection for the single listing
-        const listing = await Listing.findOne({ ListingId: req.params.id }, 'ListingId ListPrice Latitude Longitude media.MediaURL');
+        const listing = await Listing.findOne({ ListingId: req.params.id }, 'ListingId ListPrice Latitude Longitude StandardStatus  media.MediaURL');
         if (!listing) {
             return res.status(404).json({ message: 'Listing not found' });
         }
