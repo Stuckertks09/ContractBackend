@@ -12,7 +12,8 @@ router.post('/showing', async (req, res) => {
     const newShowing = new Showing({
       dateTime,
       propertyAddress,
-      instructions
+      instructions,
+      MLSNumber
     });
 
     // Save the new showing to the database
