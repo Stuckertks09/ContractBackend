@@ -91,5 +91,23 @@ router.post('/showing/:showingId/opinion', async (req, res) => {
   }
 });
 
+// Endpoint to get the opinions (rating and notes) for a specific showing
+router.get('/showing/:showingId/opinions', async (req, res) => {
+  const { showingId } = req.params;
+
+  try {
+    // Find the showing by ID and select the opinions field
+    const showing = await Showing.findById(showingId).select('opinions');
+
+    if (!showing) {
+      return res.status(404).json({ message: 'Showing not found' });
+    }
+
+    res.status(200).json({ message: 'Opinions retrieved successfully', opinions: showing.opinions });
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving opinions', error });
+  }
+});
+
 module.exports = router;
 
