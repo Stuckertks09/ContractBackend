@@ -29,6 +29,9 @@ const showingSchema = new mongoose.Schema({
   instructions: {
     type: String
   },
+   MLSNumber: {
+    type: String
+  },
   userId: {
     type: String, 
     default: null 
