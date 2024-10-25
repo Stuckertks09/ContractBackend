@@ -5,7 +5,7 @@ const Showing = require('../models/Showing');
 
 // Route to handle POST request to create a new showing
 router.post('/showing', async (req, res) => {
-  const { dateTime, propertyAddress, instructions } = req.body;
+  const { dateTime, propertyAddress, instructions, MLSNumber } = req.body;
 
   try {
     // Create a new showing entry
