@@ -23,27 +23,47 @@ const listings = await Listing.find({
     }
 });
 
-// GET /api/listings3 - Get listings with pagination and media URLs, querying geospatial index
+// GET /api/listings/listings3 - Get listings with pagination and media URLs, querying geospatial index
 router.get('/listings3', async (req, res) => {
     try {
+        // Destructure query parameters
         const { northEastLat, northEastLng, southWestLat, southWestLng } = req.query;
+
+        console.log('Query Parameters:', req.query); // Log incoming parameters for debugging
+
+        // Validate that all coordinates are present and numeric
+        if (
+            [northEastLat, northEastLng, southWestLat, southWestLng].some(coord => coord == null || isNaN(coord))
+        ) {
+            return res.status(400).json({ message: 'Invalid coordinates provided. All coordinates must be numeric.' });
+        }
+
+        // Parse the coordinates to numbers
+        const northEastLatNum = parseFloat(northEastLat);
+        const northEastLngNum = parseFloat(northEastLng);
+        const southWestLatNum = parseFloat(southWestLat);
+        const southWestLngNum = parseFloat(southWestLng);
+
+        console.log('Parsed Coordinates:', { northEastLatNum, northEastLngNum, southWestLatNum, southWestLngNum }); // Log parsed values
 
         // Define the bounding box as a GeoJSON Polygon
         const boundingBox = {
             type: 'Polygon',
             coordinates: [[
-                [southWestLng, southWestLat],
-                [northEastLng, southWestLat],
-                [northEastLng, northEastLat],
-                [southWestLng, northEastLat],
-                [southWestLng, southWestLat]
+                [southWestLngNum, southWestLatNum],  // Bottom-left
+                [northEastLngNum, southWestLatNum],   // Bottom-right
+                [northEastLngNum, northEastLatNum],    // Top-right
+                [southWestLngNum, northEastLatNum],    // Top-left
+                [southWestLngNum, southWestLatNum]     // Close the polygon
             ]]
         };
 
+        console.log('Bounding Box:', boundingBox); // Log the bounding box for debugging
+
         // Query using the geospatial index on the location field
         const listings = await Listing.find({
-            StandardStatus: 'Active', // Filter for active listings only
-            location: { $geoWithin: { $geometry: boundingBox } } // Use geospatial index for filtering
+            StandardStatus: 'Active',
+            location: { $geoWithin: { $geometry: boundingBox } }
         }).select(
             'ListingId ListPrice Latitude Longitude PublicRemarks media.MediaURL BathroomsTotalInteger BedroomsTotal StandardStatus City PostalCode StateOrProvince StreetDirPrefix StreetName StreetNumber StreetSuffix PropertyType ArchitecturalStyle YearBuilt GarageSpaces BuildingAreaTotal TaxAnnualAmount LotSizeAcres'
         );
@@ -54,6 +74,8 @@ router.get('/listings3', async (req, res) => {
         res.status(500).json({ message: 'Server error', error });
     }
 });
+
+module.exports = router; 
 
 
 // GET /api/listings/:id - Get a single listing by ListingId
