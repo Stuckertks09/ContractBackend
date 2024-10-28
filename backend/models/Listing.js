@@ -1,5 +1,3 @@
-// models/Listing.js
-
 const mongoose = require('mongoose');
 
 const listingSchema = new mongoose.Schema({
@@ -33,9 +31,30 @@ const listingSchema = new mongoose.Schema({
             // type: mongoose.Schema.Types.Mixed
         },
     ],
+    // Add the location field with geospatial properties
+    location: {
+        type: { type: String, enum: ['Point'], default: 'Point' },
+        coordinates: {
+            type: [Number],
+            validate: {
+                validator: function (value) {
+                    return value.length === 2;
+                },
+                message: 'Coordinates must be an array of two numbers [longitude, latitude].'
+            },
+            required: function () {
+                // Only require location if Latitude and Longitude are present
+                return this.Latitude != null && this.Longitude != null;
+            }
+        }
+    }
 });
+
+// Create a geospatial index on the location field for efficient querying
+listingSchema.index({ location: '2dsphere' });
 
 const Listing = mongoose.model('Listing', listingSchema, 'Listings'); // Specify the collection name if necessary
 
 module.exports = Listing;
+
 
