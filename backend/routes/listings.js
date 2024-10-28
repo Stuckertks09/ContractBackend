@@ -23,6 +23,38 @@ const listings = await Listing.find({
     }
 });
 
+// GET /api/listings3 - Get listings with pagination and media URLs, querying geospatial index
+router.get('/listings3', async (req, res) => {
+    try {
+        const { northEastLat, northEastLng, southWestLat, southWestLng } = req.query;
+
+        // Define the bounding box as a GeoJSON Polygon
+        const boundingBox = {
+            type: 'Polygon',
+            coordinates: [[
+                [southWestLng, southWestLat],
+                [northEastLng, southWestLat],
+                [northEastLng, northEastLat],
+                [southWestLng, northEastLat],
+                [southWestLng, southWestLat]
+            ]]
+        };
+
+        // Query using the geospatial index on the location field
+        const listings = await Listing.find({
+            StandardStatus: 'Active', // Filter for active listings only
+            location: { $geoWithin: { $geometry: boundingBox } } // Use geospatial index for filtering
+        }).select(
+            'ListingId ListPrice Latitude Longitude PublicRemarks media.MediaURL BathroomsTotalInteger BedroomsTotal StandardStatus City PostalCode StateOrProvince StreetDirPrefix StreetName StreetNumber StreetSuffix PropertyType ArchitecturalStyle YearBuilt GarageSpaces BuildingAreaTotal TaxAnnualAmount LotSizeAcres'
+        );
+
+        res.json({ listings });
+    } catch (error) {
+        console.error('Error fetching listings:', error);
+        res.status(500).json({ message: 'Server error', error });
+    }
+});
+
 
 // GET /api/listings/:id - Get a single listing by ListingId
 router.get('/:id', async (req, res) => {
