@@ -19,4 +19,19 @@ router.post('/', async (req, res) => {
   }
 });
 
+// GET /api/offers - Retrieve a list of all offers
+router.get('/list', async (req, res) => {
+  try {
+    // Fetch all offers with selective fields
+    const offers = await Offer.find({}, 'offerName purchasePrice stage listing _id')
+      .populate('listing', 'address') // Populate listing field with only address if needed
+      .exec();
+
+    res.status(200).json(offers);
+  } catch (error) {
+    console.error('Error fetching offers:', error);
+    res.status(500).json({ message: 'Error fetching offers', error });
+  }
+});
+
 module.exports = router;
