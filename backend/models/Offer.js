@@ -5,8 +5,8 @@ const OfferSchema = new mongoose.Schema({
   appraisalBuffer: { type: Boolean },
   appraisalBufferAmount: { type: Number }, // Currency (16, 2)
   appraisalContingency: { type: Boolean },
+  additionalProvisions: { type: String },
   bindingAcceptance: { type: Date },
-  bindingAcceptanceTime: { type: String }, // Time as a String
   closingDate: { type: Date },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Lookup(User)
   daysBeforeClosingSeptic: { type: Number }, // Number(18, 0)
