@@ -12,6 +12,7 @@ const authRoute = require('./routes/auth');
 const showingRoutes = require('./routes/Showing');
 const userRoutes = require('./routes/user');
 const chatRoutes = require('./routes/chatRoutes');
+const offersRoute = require('./routes/offers');
 
 dotenv.config(); // Load environment variables
 
@@ -45,6 +46,7 @@ app.use('/api/auth', authRoute);
 app.use('/api', showingRoutes);
 app.use('/api', userRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/offers', offersRoute);
 
 // Import and use the Socket.IO handler
 require('./routes/socket')(io);  // Pass the io instance to the socket handler
