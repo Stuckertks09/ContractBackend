@@ -80,4 +80,21 @@ const OfferSchema = new mongoose.Schema({
   yearsAmortized: { type: Number } // Number(18, 0)
 });
 
+OfferSchema.post('save', async function (doc) {
+  if (doc.isNew) { // Only run on newly created offers
+    try {
+      const buyers = await doc.populate('buyers').execPopulate(); // Populate buyers field
+
+      for (const buyer of buyers) {
+        const emailContent = OfferSummaryEmailTemplate(doc, buyer); // Generate email content for each buyer
+        await sendOfferEmail(buyer, emailContent); // Send email to each buyer
+      }
+
+      console.log('Offer summary emails sent to all buyers.');
+    } catch (error) {
+      console.error('Error sending offer summary emails:', error);
+    }
+  }
+});
+
 module.exports = mongoose.model('Offer', OfferSchema);
