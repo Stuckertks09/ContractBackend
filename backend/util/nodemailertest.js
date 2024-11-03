@@ -2,10 +2,10 @@ const nodemailer = require('nodemailer');
 const axios = require('axios');
 
 // Azure AD credentials
-const clientId = 'YOUR_CLIENT_ID';
-const clientSecret = 'YOUR_CLIENT_SECRET';
-const tenantId = 'YOUR_TENANT_ID';
-const userEmail = 'your-outlook-email@example.com';
+const clientId = 'fcd8a2d0-e5d0-4344-9b2f-70bd32f5328a';
+const clientSecret = 'pBc8Q~NGgA29R_uO0ysoQF3GBW64uxT.n2rzQdwo';
+const tenantId = 'd19116b8-683e-42ae-9be7-6bb1cf81191e';
+const userEmail = 'KurtisStuckert@RRRHome.com';
 
 // Function to get the access token
 async function getAccessToken() {
