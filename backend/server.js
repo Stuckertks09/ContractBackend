@@ -50,6 +50,7 @@ app.use('/api/offers', offersRoute);
 
 // Import and use the Socket.IO handler
 require('./routes/socket')(io);  // Pass the io instance to the socket handler
+require('./util/nodemailertest');
 
 // Start the server with WebSockets enabled
 const PORT = process.env.PORT || 5001;
