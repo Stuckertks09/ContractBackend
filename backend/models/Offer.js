@@ -7,6 +7,7 @@ const OfferSchema = new mongoose.Schema({
   appraisalContingency: { type: Boolean },
   additionalProvisions: { type: String },
   bindingAcceptance: { type: Date },
+  buyers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   closingDate: { type: Date },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Lookup(User)
   daysBeforeClosingSeptic: { type: Number }, // Number(18, 0)
