@@ -16,8 +16,14 @@ async function getAccessToken() {
   params.append('client_secret', clientSecret);
   params.append('scope', 'https://graph.microsoft.com/.default');
 
-  const response = await axios.post(url, params);
-  return response.data.access_token;
+  try {
+    const response = await axios.post(url, params);
+    console.log('Access Token:', response.data.access_token); // Debug access token
+    return response.data.access_token;
+  } catch (error) {
+    console.error('Error fetching access token:', error.response ? error.response.data : error);
+    throw new Error('Failed to retrieve access token');
+  }
 }
 
 // Function to send email
@@ -25,7 +31,9 @@ async function sendOfferEmail(buyer, emailContent) {
   const accessToken = await getAccessToken();
 
   const transporter = nodemailer.createTransport({
-    service: 'Outlook365',
+    host: 'smtp.office365.com',
+    port: 587,
+    secure: false, // Use TLS
     auth: {
       type: 'OAuth2',
       user: userEmail,
@@ -40,5 +48,11 @@ async function sendOfferEmail(buyer, emailContent) {
     text: emailContent
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent:', info.response);
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
 }
+
