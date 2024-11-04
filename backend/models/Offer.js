@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const { sendOfferEmail } = require('./util/nodemailertest'); // Adjusted path to emailService.js
-const { OfferSummaryEmailTemplate } = require('./util/OfferSummaryEmailTemplate'); // Adjusted path to OfferSummaryEmailTemplate.js
+const { sendOfferEmail } = require( '../util/nodemailertest'); // Adjusted path to emailService.js
+const { OfferSummaryEmailTemplate } = require('../util/OfferSummaryEmailTemplate'); // Adjusted path to OfferSummaryEmailTemplate.js
 
 const OfferSchema = new mongoose.Schema({
   acceptedOfferDate: { type: Date },
