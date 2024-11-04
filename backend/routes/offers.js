@@ -58,14 +58,20 @@ router.put('/:offerId', async (req, res) => {
   const updateData = req.body; // The data to update
 
   try {
-    const updatedOffer = await Offer.findByIdAndUpdate(offerId, updateData, {
-      new: true, // Returns the updated document
-      runValidators: true, // Ensures validation rules are applied
-    });
+    // Retrieve the offer document
+    const offer = await Offer.findById(offerId);
 
-    if (!updatedOffer) {
+    if (!offer) {
       return res.status(404).json({ message: 'Offer not found' });
     }
+
+    // Update the fields in the document
+    Object.keys(updateData).forEach((key) => {
+      offer[key] = updateData[key];
+    });
+
+    // Save the updated offer (triggers `save` middleware)
+    const updatedOffer = await offer.save();
 
     res.status(200).json(updatedOffer);
   } catch (error) {
