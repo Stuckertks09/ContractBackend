@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { sendOfferEmail } = require('../util/nodemailertest'); // Adjusted path to emailService.js
 const OfferSummaryEmailTemplate = require('../util/OfferSummaryEmailTemplate'); // Adjusted path to OfferSummaryEmailTemplate.js
+const Transaction = require('./Transaction');
 
 const OfferSchema = new mongoose.Schema({
   acceptedOfferDate: { type: Date },
@@ -60,11 +61,15 @@ OfferSchema.post('save', async function (doc) {
   if (doc.stage === 'Accepted Offer') {
     console.log('Creating transaction for accepted offer:', doc._id);
 
-    const calculateDueDate = (baseDate, days) => {
-      const resultDate = new Date(baseDate);
-      resultDate.setDate(resultDate.getDate() + days);
-      return resultDate;
-    };
+// Updated calculateDueDate function to handle missing values
+const calculateDueDate = (baseDate, days) => {
+  if (!baseDate || isNaN(new Date(baseDate).getTime()) || days === undefined || days === null) {
+    return null; // Return null if baseDate or days is invalid
+  }
+  const resultDate = new Date(baseDate);
+  resultDate.setDate(resultDate.getDate() + days);
+  return resultDate;
+};
 
     const transactionData = {
       acceptedOfferDate: doc.acceptedOfferDate,
