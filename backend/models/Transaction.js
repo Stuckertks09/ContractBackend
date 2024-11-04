@@ -72,7 +72,8 @@ const TransactionSchema = new mongoose.Schema({
   transactionName: { type: String, maxlength: 80 },
   wellAndWaterContingency: { type: Boolean },
   wellAndWaterDueDate: { type: Date },
-  wellPaidBy: { type: String, enum: ['Buyer', 'Seller'] } // Picklist
+  wellPaidBy: { type: String, enum: ['Buyer', 'Seller'] }, // Picklist
+  offer: { type: mongoose.Schema.Types.ObjectId, ref: 'Offer' }
 });
 
 module.exports = mongoose.model('Transaction', TransactionSchema);
