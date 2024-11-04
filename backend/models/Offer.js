@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { sendOfferEmail } = require( '../util/nodemailertest'); // Adjusted path to emailService.js
-const { OfferSummaryEmailTemplate } = require('../util/OfferSummaryEmailTemplate'); // Adjusted path to OfferSummaryEmailTemplate.js
+const OfferSummaryEmailTemplate = require('../util/OfferSummaryEmailTemplate'); // Adjusted path to OfferSummaryEmailTemplate.js
 
 const OfferSchema = new mongoose.Schema({
   acceptedOfferDate: { type: Date },
@@ -87,7 +87,7 @@ OfferSchema.post('save', async function (doc) {
   console.log('Post-save hook triggered for offer:', doc._id);
 
   // Populate buyers with User data to get email addresses
-  await doc.populate('buyers').execPopulate();
+  await doc.populate('buyers');
   console.log('Populated buyers:', doc.buyers);
 
   // Send email to each buyer
