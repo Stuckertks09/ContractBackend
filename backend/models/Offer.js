@@ -49,19 +49,14 @@ const OfferSchema = new mongoose.Schema({
   sellerContributionAmount: { type: Number },
   septicContingency: { type: Boolean },
   septicPaidBy: { type: String, enum: ['Buyer', 'Seller'] },
-  stage: { type: String, enum: ['Accepted Offer', 'Earnest Money', 'Inspections', 'Appraisal', 'Financing', 'Awaiting Closing', 'Successfully Closed', 'Fell Through'] },
+  stage: { type: String, enum: ['Accepted Offer', 'Signatures', 'Inspections', 'Appraisal', 'Financing', 'Awaiting Closing', 'Successfully Closed', 'Fell Through'] },
   testingContingency: { type: Boolean },
   wellAndWaterContingency: { type: Boolean },
   wellPaidBy: { type: String, enum: ['Buyer', 'Seller'] },
   yearsAmortized: { type: Number }
 });
 
-// Trigger to handle status change and create a transaction
-OfferSchema.post('save', async function (doc) {
-  if (doc.stage === 'Accepted Offer') {
-    console.log('Creating transaction for accepted offer:', doc._id);
-
-// Updated calculateDueDate function to handle missing values
+// Helper function to calculate due dates
 const calculateDueDate = (baseDate, days) => {
   if (!baseDate || isNaN(new Date(baseDate).getTime()) || days === undefined || days === null) {
     return null; // Return null if baseDate or days is invalid
@@ -71,6 +66,15 @@ const calculateDueDate = (baseDate, days) => {
   return resultDate;
 };
 
+// Trigger to handle status change and create a transaction
+OfferSchema.post('findOneAndUpdate', async function (doc) {
+  if (!doc) return; // Exit if no document was found
+
+  // Check if the stage was changed to "Accepted Offer"
+  if (doc.stage === 'Accepted Offer') {
+    console.log('Creating transaction for accepted offer:', doc._id);
+
+    // Prepare transaction data
     const transactionData = {
       acceptedOfferDate: doc.acceptedOfferDate,
       additionalProvisions: doc.additionalProvisions,
@@ -109,33 +113,44 @@ const calculateDueDate = (baseDate, days) => {
     };
 
     try {
-      const Transaction = mongoose.model('Transaction'); // Ensure Transaction model is available
+      // Create a new Transaction document
       const newTransaction = new Transaction(transactionData);
       await newTransaction.save();
       console.log('Transaction created successfully:', newTransaction._id);
     } catch (error) {
       console.error('Error creating transaction:', error);
     }
-  }
-}); // <-- Added closing bracket here
-
-// Trigger to send email after saving an Offer
-OfferSchema.post('save', async function (doc) {
-  console.log('Post-save hook triggered for offer:', doc._id);
-
-  await doc.populate('buyers');
-  console.log('Populated buyers:', doc.buyers);
-
-  for (const buyer of doc.buyers) {
-    if (buyer && buyer.email) {
-      console.log(`Sending email to buyer: ${buyer.email}`);
-      const emailContent = OfferSummaryEmailTemplate(doc, buyer);
-      await sendOfferEmail(buyer, emailContent);
-    } else {
-      console.error(`Buyer email not found for buyer ID: ${buyer._id}`);
-    }
+  } else {
+    console.log(`Transaction creation skipped for offer ${doc._id} because stage is not "Accepted Offer".`);
   }
 });
+
+OfferSchema.post('findOneAndUpdate', async function (doc) {
+  if (!doc) return; // If no document was found, exit early
+
+  // Fetch the full document by ID to ensure all fields are included
+  const fullDoc = await this.model.findById(doc._id).populate('buyers');
+
+  console.log('Full document after findOneAndUpdate:', fullDoc);
+  const isStageChangedToSignatures = (this.previousStage !== 'Signatures' && fullDoc.stage === 'Signatures');
+
+  if (isStageChangedToSignatures) {
+    console.log('Stage is "Signatures" for offer, sending offer email:', fullDoc._id);
+
+    for (const buyer of fullDoc.buyers) {
+      if (buyer && buyer.email) {
+        const emailContent = OfferSummaryEmailTemplate(fullDoc, buyer); // Use `fullDoc` to ensure all fields are present
+        await sendOfferEmail(buyer, fullDoc, emailContent); // Pass the complete document
+        console.log(`Offer email sent to ${buyer.email}`);
+      } else {
+        console.error(`Buyer email not found for buyer ID: ${buyer._id}`);
+      }
+    }
+  } else {
+    console.log(`Offer ${fullDoc._id} updated without stage change to "Signatures". Email not sent.`);
+  }
+});
+
 
 const Offer = mongoose.model('Offer', OfferSchema);
 module.exports = Offer;

@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const { sendTransactionEmail } = require('../util/nodemailertest'); // Adjusted path to email utility
+const TransactionEmailTemplate = require('../util/BuyerTransactionEmailTemplate'); // Adjusted path to transaction email template
 
 const TransactionSchema = new mongoose.Schema({
   acceptedOfferDate: { type: Date },
@@ -76,4 +78,26 @@ const TransactionSchema = new mongoose.Schema({
   offer: { type: mongoose.Schema.Types.ObjectId, ref: 'Offer' }
 });
 
-module.exports = mongoose.model('Transaction', TransactionSchema);
+TransactionSchema.post('save', async function (doc) {
+  // Send email only for newly created transactions
+  console.log('New transaction created, sending transaction email:', doc._id);
+
+  try {
+    await doc.populate('buyers'); // Populate buyer information
+    for (const buyer of doc.buyers) {
+      if (buyer && buyer.email) {
+        const emailContent = TransactionEmailTemplate(doc, buyer);
+        await sendTransactionEmail(buyer, doc, emailContent);
+        console.log(`Transaction email sent to ${buyer.email}`);
+      } else {
+        console.error(`Buyer email not found for buyer ID: ${buyer._id}`);
+      }
+    }
+  } catch (error) {
+    console.error(`Error sending transaction email for transaction ${doc._id}:`, error);
+  }
+});
+
+
+const Transaction = mongoose.model('Transaction', TransactionSchema);
+module.exports = Transaction;

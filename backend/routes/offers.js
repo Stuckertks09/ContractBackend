@@ -52,26 +52,21 @@ router.get('/:offerId', async (req, res) => {
   }
 });
 
-// PUT /:offerId - Update a specific offer by ID
+// Route to update Offer and trigger hooks for findOneAndUpdate
 router.put('/:offerId', async (req, res) => {
   const { offerId } = req.params;
-  const updateData = req.body; // The data to update
+  const updateData = req.body;
 
   try {
-    // Retrieve the offer document
-    const offer = await Offer.findById(offerId);
-
-    if (!offer) {
-      return res.status(404).json({ message: 'Offer not found' });
-    }
-
-    // Update the fields in the document
-    Object.keys(updateData).forEach((key) => {
-      offer[key] = updateData[key];
+    const updatedOffer = await Offer.findOneAndUpdate({ _id: offerId }, updateData, {
+      new: true,               // Return the updated document
+      runValidators: true,     // Ensure validation rules are applied
+      setDefaultsOnInsert: true // Set default values if creating a new document
     });
 
-    // Save the updated offer (triggers `save` middleware)
-    const updatedOffer = await offer.save();
+    if (!updatedOffer) {
+      return res.status(404).json({ message: 'Offer not found' });
+    }
 
     res.status(200).json(updatedOffer);
   } catch (error) {
@@ -79,6 +74,7 @@ router.put('/:offerId', async (req, res) => {
     res.status(500).json({ message: 'Error updating offer', error });
   }
 });
+
 
 // DELETE /:offerId - Delete a specific offer by ID
 router.delete('/:offerId', async (req, res) => {

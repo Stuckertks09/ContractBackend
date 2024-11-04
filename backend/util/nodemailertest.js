@@ -25,14 +25,14 @@ async function getAccessToken() {
   }
 }
 
-// Function to send email using Microsoft Graph API
-async function sendOfferEmail(buyer, emailContent) {
+// General function to send email using Microsoft Graph API
+async function sendEmail(recipient, subject, emailContent) {
   const accessToken = await getAccessToken();
   const url = `https://graph.microsoft.com/v1.0/users/${userEmail}/sendMail`;
 
   const emailData = {
     message: {
-      subject: 'New Offer Summary',
+      subject: subject,
       body: {
         contentType: 'HTML',
         content: emailContent
@@ -40,7 +40,7 @@ async function sendOfferEmail(buyer, emailContent) {
       toRecipients: [
         {
           emailAddress: {
-            address: buyer.email
+            address: recipient.email
           }
         }
       ],
@@ -65,4 +65,16 @@ async function sendOfferEmail(buyer, emailContent) {
   }
 }
 
-module.exports = { sendOfferEmail };
+// Wrapper function for sending offer email with dynamic subject
+async function sendOfferEmail(buyer, offer, emailContent) {
+  const subject = `Offer Summary: ${offer.offerName || 'Untitled Offer'}`;
+  await sendEmail(buyer, subject, emailContent);
+}
+
+// Wrapper function for sending transaction email with dynamic subject
+async function sendTransactionEmail(buyer, transaction, emailContent) {
+  const subject = `Dates and Deadlines: ${transaction.transactionName || 'Transaction'}`;
+  await sendEmail(buyer, subject, emailContent);
+}
+
+module.exports = { sendOfferEmail, sendTransactionEmail };
