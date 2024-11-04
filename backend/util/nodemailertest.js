@@ -1,4 +1,3 @@
-const nodemailer = require('nodemailer');
 const axios = require('axios');
 
 // Azure AD credentials
@@ -26,33 +25,44 @@ async function getAccessToken() {
   }
 }
 
-// Function to send email
+// Function to send email using Microsoft Graph API
 async function sendOfferEmail(buyer, emailContent) {
   const accessToken = await getAccessToken();
+  const url = `https://graph.microsoft.com/v1.0/users/${userEmail}/sendMail`;
 
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.office365.com',
-    port: 587,
-    secure: false, // Use TLS
-    auth: {
-      type: 'OAuth2',
-      user: userEmail,
-      accessToken: accessToken
+  const emailData = {
+    message: {
+      subject: 'New Offer Summary',
+      body: {
+        contentType: 'Text',
+        content: emailContent
+      },
+      toRecipients: [
+        {
+          emailAddress: {
+            address: buyer.email
+          }
+        }
+      ],
+      from: {
+        emailAddress: {
+          address: userEmail
+        }
+      }
     }
-  });
-
-  const mailOptions = {
-    from: userEmail,
-    to: buyer.email,
-    subject: 'New Offer Summary',
-    text: emailContent
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent:', info.response);
+    const response = await axios.post(url, emailData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    console.log('Email sent successfully:', response.data);
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Error sending email:', error.response ? error.response.data : error);
   }
 }
 
+module.exports = { sendOfferEmail };

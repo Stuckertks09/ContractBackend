@@ -82,21 +82,25 @@ const OfferSchema = new mongoose.Schema({
   yearsAmortized: { type: Number } // Number(18, 0)
 });
 
+// Trigger to send email after saving an Offer
 OfferSchema.post('save', async function (doc) {
-  if (doc.isNew) { // Only run on newly created offers
-    try {
-      const buyers = await doc.populate('buyers').execPopulate(); // Populate buyers field
+  console.log('Post-save hook triggered for offer:', doc._id);
 
-      for (const buyer of buyers) {
-        const emailContent = OfferSummaryEmailTemplate(doc, buyer); // Generate email content for each buyer
-        await sendOfferEmail(buyer, emailContent); // Send email to each buyer
-      }
+  // Populate buyers with User data to get email addresses
+  await doc.populate('buyers').execPopulate();
+  console.log('Populated buyers:', doc.buyers);
 
-      console.log('Offer summary emails sent to all buyers.');
-    } catch (error) {
-      console.error('Error sending offer summary emails:', error);
+  // Send email to each buyer
+  for (const buyer of doc.buyers) {
+    if (buyer && buyer.email) {
+      console.log(`Sending email to buyer: ${buyer.email}`);
+      const emailContent = OfferSummaryEmailTemplate(doc, buyer);
+      await sendOfferEmail(buyer, emailContent);
+    } else {
+      console.error(`Buyer email not found for buyer ID: ${buyer._id}`);
     }
   }
 });
 
-module.exports = mongoose.model('Offer', OfferSchema);
+const Offer = mongoose.model('Offer', OfferSchema);
+module.exports = Offer;
