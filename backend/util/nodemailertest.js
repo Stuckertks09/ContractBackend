@@ -34,7 +34,7 @@ async function sendOfferEmail(buyer, emailContent) {
     message: {
       subject: 'New Offer Summary',
       body: {
-        contentType: 'Text',
+        contentType: 'HTML',
         content: emailContent
       },
       toRecipients: [
