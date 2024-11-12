@@ -1,25 +1,76 @@
-// routes/docusignRoutes.js
 const express = require('express');
 const router = express.Router();
 const docusign = require('docusign-esign');
 const fs = require('fs');
 const path = require('path');
-
-// Middleware for handling file uploads (e.g., using Multer)
 const multer = require('multer');
+const dotenv = require('dotenv');
+
+dotenv.config(); 
+
+// Middleware for handling file uploads
 const upload = multer({ dest: 'uploads/' }); // Temporary storage path
 
 // DocuSign API configuration
 const { ACCOUNT_ID, INTEGRATOR_KEY, PRIVATE_KEY, USER_ID } = process.env;
 
 // Initialize the DocuSign client
-const getDocusignClient = () => {
+const getDocusignClient = (accessToken) => {
   const apiClient = new docusign.ApiClient();
   apiClient.setOAuthBasePath('account-d.docusign.com'); // Adjust for production if needed
   apiClient.setBasePath('https://demo.docusign.net/restapi'); // Sandbox endpoint
-  apiClient.addDefaultHeader('Authorization', `Bearer ${YOUR_ACCESS_TOKEN}`);
+  apiClient.addDefaultHeader('Authorization', `Bearer ${accessToken}`);
   return apiClient;
 };
+
+// Route to generate consent URL
+router.get('/generate-consent', (req, res) => {
+  const apiClient = new docusign.ApiClient();
+  const redirectUri = `http://localhost:5001/callback`; // Callback URL
+
+  // Define necessary scopes for consent
+  const scopes = ['signature', 'impersonation'];
+
+  // Generate the consent URL
+  const consentUrl = apiClient.getAuthorizationUri(
+    INTEGRATOR_KEY, // Your Integrator Key
+    redirectUri,
+    scopes,
+    USER_ID // User ID
+  );
+
+  console.log('Integrator Key:', INTEGRATOR_KEY);
+
+  // Redirect user to consent page
+  res.redirect(consentUrl);
+});
+
+// Callback route to handle DocuSign consent
+router.get('/callback', async (req, res) => {
+  const { code } = req.query; // Capture the authorization code
+  if (!code) {
+    return res.status(400).send('Authorization code missing');
+  }
+
+  try {
+    const apiClient = new docusign.ApiClient();
+    const tokenResponse = await apiClient.getToken(
+      INTEGRATOR_KEY,
+      USER_ID,
+      code, // Authorization code received from the consent flow
+      PRIVATE_KEY // Your RSA private key
+    );
+
+    const accessToken = tokenResponse.body.access_token; // Extract the access token
+
+    // You can now use the access token to create the DocuSign client
+    const client = getDocusignClient(accessToken);
+    res.send('Consent granted! Access token received.'); // Inform the user
+  } catch (error) {
+    console.error('Error exchanging authorization code:', error);
+    res.status(500).send('Error exchanging authorization code');
+  }
+});
 
 // Endpoint to create an envelope
 router.post('/create-envelope', upload.single('file'), async (req, res) => {
@@ -62,7 +113,8 @@ router.post('/create-envelope', upload.single('file'), async (req, res) => {
       },
     };
 
-    const apiClient = getDocusignClient();
+    // Create the DocuSign client with the valid access token
+    const apiClient = getDocusignClient(req.headers.authorization.split(' ')[1]); // Extract access token from request headers
     const envelopesApi = new docusign.EnvelopesApi(apiClient);
     const results = await envelopesApi.createEnvelope(ACCOUNT_ID, { envelopeDefinition });
     const envelopeId = results.envelopeId;
@@ -72,7 +124,7 @@ router.post('/create-envelope', upload.single('file'), async (req, res) => {
     for (const recipient of recipients) {
       if (recipient.method === 'inApp') {
         const viewRequest = {
-          returnUrl: 'app://signingComplete', // Mobile app redirect
+          returnUrl: 'http://localhost:5001/signingComplete', // Specify where to redirect after signing
           authenticationMethod: 'none',
           userName: recipient.name,
           email: recipient.email,

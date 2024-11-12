@@ -7,12 +7,16 @@ const cors = require('cors');
 const twilio = require('twilio');
 const listingsRoute = require('./routes/listings');
 const twilioRoute = require('./routes/twilio');
+const docusign = require('docusign-esign');
 const searchRoute = require('./routes/search');
 const authRoute = require('./routes/auth');
 const showingRoutes = require('./routes/Showing');
 const userRoutes = require('./routes/user');
 const chatRoutes = require('./routes/chatRoutes');
 const offersRoute = require('./routes/offers');
+const docusignRoutes = require('./routes/docusignRoutes');
+const docusignConsentRoutes = require('./routes/docusignConsentRoutes');
+const templatesRoute = require('./routes/templates');
 
 dotenv.config(); // Load environment variables
 
@@ -47,10 +51,14 @@ app.use('/api', showingRoutes);
 app.use('/api', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/offers', offersRoute);
+app.use('/api/docusign', docusignRoutes);
+app.use('/docusign', docusignConsentRoutes);
+app.use('/api/templates', templatesRoute);
 
 // Import and use the Socket.IO handler
 require('./routes/socket')(io);  // Pass the io instance to the socket handler
 require('./util/nodemailertest');
+
 
 // Start the server with WebSockets enabled
 const PORT = process.env.PORT || 5001;
