@@ -137,9 +137,6 @@ Admin UI for reviewing and generating contracts
 ## 🙋‍♂️ Why It Exists
 This was built to solve a real bottleneck: generating contracts from scratch every time. The system mimics how agents actually work — with data scattered across platforms and deadlines everywhere. This backend puts it all in one place, and builds the paperwork for you.
 
-👤 Author
-Kurtis Stuckert
-Builder, systems guy, ex-broker. Built this for a real business — not for show.
-
-👤 Author Kurtis Stuckert Builder, systems and operations, ex-broker. Built this for a real business — not for show.
+## 👤 Author 
+Kurtis Stuckert Builder, systems and operations, ex-broker. Built this for a real business — not for show.
 
