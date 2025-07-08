@@ -123,7 +123,7 @@ backend/
 
 ---
 
-🗺 Roadmap
+## 🗺 Roadmap
 Overflow-safe field splitting and multi-page addenda
 
 Signature block injection
@@ -134,7 +134,7 @@ Cloud uploads (S3/GCS)
 
 Admin UI for reviewing and generating contracts
 
-🙋‍♂️ Why It Exists
+## 🙋‍♂️ Why It Exists
 This was built to solve a real bottleneck: generating contracts from scratch every time. The system mimics how agents actually work — with data scattered across platforms and deadlines everywhere. This backend puts it all in one place, and builds the paperwork for you.
 
 👤 Author
